@@ -1,0 +1,4 @@
+**/node_modules
+**/target
+**/wasm_target
+server/static

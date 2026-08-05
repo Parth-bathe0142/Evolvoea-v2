@@ -1,0 +1,20 @@
+{
+    "evolvoea": {
+        "playerPos": { "x": 17, "y": 15 },
+        "randomSpawns": 7,
+        "mapConfig": {
+            "name": "evolvoea",
+            "spritesheetSize": [7, 8],
+            "goal": { "x": 47, "y": 31}
+        }
+    },
+    "tutorial_project": {
+        "playerPos": { "x": 20, "y": 20 },
+        "randomSpawns": 8,
+        "mapConfig": {
+            "name": "tutorial_project",
+            "spritesheetSize": [7, 8],
+            "goal": { "x": 64, "y": 65}
+        }
+    }
+}

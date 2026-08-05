@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "build": "bun run build.ts prod",
+    "build:dev": "bun run build.ts dev",
+    "watch": "bun build src/main.ts --watch --outdir ../server/public --target browser --format esm"
+  },
+  "name": "game",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "game-wasm": "file:../wasm_target"
+  }
+}
