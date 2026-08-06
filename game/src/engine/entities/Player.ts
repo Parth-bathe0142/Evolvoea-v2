@@ -1,4 +1,4 @@
-import type { GridDirs } from "../misc.js";
+import type { GridDirs } from "../types";
 import { GridCharacter, type GridCharacterConfig } from "./GridCharacter.js";
 
 export interface PlayerConfig extends GridCharacterConfig {

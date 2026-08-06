@@ -1,5 +1,5 @@
 import { idGenerator } from "./IdGenerator.js"
-import { type Coord } from "./misc.js"
+import { type Coord } from "./types"
 import { Sprite, type SpriteConfig } from "./Sprite.js"
 
 

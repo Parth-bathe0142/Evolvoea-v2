@@ -1,6 +1,6 @@
 import { utils } from "./utils.js";
 import { GameObject, type GameObjectConfig } from "./GameObject.js";
-import type { Coord, GridDirs } from "./misc.js";
+import type { Coord, GridDirs } from "./types";
 
 export interface MovableObjectGridConfig extends GameObjectConfig {
     gridPos?: Coord

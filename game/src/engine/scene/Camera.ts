@@ -1,6 +1,6 @@
 import { utils } from "../utils.js";
 import { GameObject } from "../GameObject.js";
-import type { Coord } from "../misc.js";
+import type { Coord } from "../types";
 
 interface CameraConfig {
     center?: Coord

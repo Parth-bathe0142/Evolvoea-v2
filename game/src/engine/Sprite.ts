@@ -7,7 +7,7 @@ import {
 	DEFAULT_ANIM_DURATION,
 	DRAW_SIZE,
 	type GameState,
-} from "./misc.js";
+} from "./types";
 
 export interface SpriteConfig {
 	gameObject?: GameObject;

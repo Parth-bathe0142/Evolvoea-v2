@@ -1,4 +1,4 @@
-import type { Coord, FreeCollider, GridDirs } from "./misc.js";
+import type { Coord, FreeCollider, GridDirs } from "./types";
 import { MovableObjectFree } from "./MovableObject.js";
 
 /**

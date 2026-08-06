@@ -1,5 +1,5 @@
 import { GameObject } from "../GameObject.js";
-import type { Coord } from "../misc.js";
+import type { Coord } from "../types";
 import { utils } from "../utils.js";
 
 export interface Tile {

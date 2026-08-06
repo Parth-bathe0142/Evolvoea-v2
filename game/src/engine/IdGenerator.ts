@@ -12,7 +12,7 @@ export const idGenerator = {
             if(!bookedIds.has(id))
                 return id
             else bookedIds.delete(id)
-            id++
+            id = _idGenerator.next().value!
         }
     },
 

@@ -1,5 +1,5 @@
 import { Scene } from "../scene";
-import type { Coord, GridDirs, Puppet, PuppetCommand } from "../misc.js";
+import type { Coord, GridDirs, Puppet, PuppetCommand } from "../types";
 import { MovableObjectGrid, type MovableObjectGridConfig } from "../MovableObject.js";
 import { utils } from "../utils.js";
 

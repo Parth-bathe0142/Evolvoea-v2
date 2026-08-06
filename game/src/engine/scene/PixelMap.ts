@@ -1,4 +1,4 @@
-import type { Coord, GameState } from "../misc.js";
+import type { Coord, GameState } from "../types";
 import { utils } from "../utils.js";
 import type { Tile } from "./Tile.js";
 
