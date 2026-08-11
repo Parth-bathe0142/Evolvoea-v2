@@ -1,11 +1,12 @@
 // very small and universal definitions are kept in a seperate file
 
-import { Time } from "./Time"
-import { Camera } from "./scene/Camera"
+import type { GameObject } from "../GameObject"
+import { Time } from "../Time"
+import { Camera } from "../scene/Camera"
 
 /**
  * Used to represent a position on the canvas or in the grid.
- * It ressembles several other objects throughout the code 
+ * It ressembles several other objects throughout the code
  * but should not be used interchangably
 */
 export interface Coord {
@@ -20,16 +21,16 @@ export interface BoundingBox {
 
 /**
  * Represents one frame in an animation.
- * The parameters crop size and draw size are maintained in the 
+ * The parameters crop size and draw size are maintained in the
  * Sprite class, not here
- * 
+ *
  * @param frame represents the location of corresponding sprite
  * in the spritesheet
- * 
+ *
  * @param duration mentions how many updates this frame will last
  */
 export interface AnimFrame {
-    frame: Coord 
+    frame: Coord
     offset?: Coord
     flip?: boolean
     duration?: number
@@ -81,6 +82,14 @@ export interface FreeCollider {
     radius: number
 }
 
+export enum TileMarkerColor {
+	Red = 0,
+	Yellow = 1,
+	Green = 2,
+	Blue = 3
+}
+
+export type GameObjectClass<T extends GameObject = GameObject> = typeof GameObject & { typeName: string }
 export type GridDirs = "up" | "right" | "down" | "left" | "none"
 export type SlimeType = "melee" | "ranged"
 export type teams = "team1" | "team2"

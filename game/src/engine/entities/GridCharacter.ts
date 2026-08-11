@@ -2,6 +2,7 @@ import { Scene } from "../scene";
 import type { Coord, GridDirs, Puppet, PuppetCommand } from "../types";
 import { MovableObjectGrid, type MovableObjectGridConfig } from "../MovableObject.js";
 import { utils } from "../utils.js";
+import type Id from "../IdGenerator.js";
 
 export interface GridCharacterConfig extends MovableObjectGridConfig {
     name: string
@@ -14,11 +15,16 @@ export interface GridCharacterConfig extends MovableObjectGridConfig {
  * can be any npc on the map
  */
 export class GridCharacter extends MovableObjectGrid implements Puppet {
+	static override readonly typeName: string = "GridCharacter";
+	
+	declare id: Id<GridCharacter>
+	
     facing: GridDirs = "down";
     beingControlled: boolean = false;
     /** Some known entities for easy creation */
     static instances: {[key: string]: GridCharacterConfig} = {
-        "person1": {
+			"person1": {
+						type: GridCharacter.typeName,
             name: "person1",
             spriteConfig: {
                 src: "assets/spritesheets/character.png"

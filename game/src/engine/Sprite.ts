@@ -67,12 +67,12 @@ export class Sprite {
 	drawSize: BoundingBox;
 	drawOffset: Coord = { x: 0, y: 0 };
 	isAnimated = true;
+	animations: { [key: string]: AnimFrame[] } = {
+		default: [{ frame: { x: 0, y: 0 } }],
+	};
 
 	private gameObject: GameObject;
 	private imgLoaded = false;
-	private animations: { [key: string]: AnimFrame[] } = {
-		default: [{ frame: { x: 0, y: 0 } }],
-	};
 	private currentAnim = "default";
 	private currentAnimFrame = 0;
 	private animProgress = 1;
