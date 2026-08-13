@@ -55,6 +55,13 @@ export interface Save {
     fromJSOM(): void
 }
 
+export interface TypeInfo<T extends GameObject = GameObject> {
+    readonly id: TypeId;
+    readonly name: string;
+    readonly cls: GameObjectClass<T>;
+    readonly ancestors: ReadonlySet<TypeId>;
+}
+
 /**
  * GameObjects that can be controlled by keyboard inputs
  * or global events, such as Player or NPCs.
@@ -89,7 +96,8 @@ export enum TileMarkerColor {
 	Blue = 3
 }
 
-export type GameObjectClass<T extends GameObject = GameObject> = typeof GameObject & { typeName: string }
+export type GameObjectClass<T extends GameObject = GameObject> = typeof GameObject
+export type TypeId = number;
 export type GridDirs = "up" | "right" | "down" | "left" | "none"
 export type SlimeType = "melee" | "ranged"
 export type teams = "team1" | "team2"

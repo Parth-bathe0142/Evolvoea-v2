@@ -1,4 +1,4 @@
-import { GameObject } from "../GameObject.js";
+import { GameObject, type GameObjectConfig } from "../GameObject.js";
 import { TileMarkerColor, type Coord } from "../types";
 import { utils } from "../utils.js";
 
@@ -6,19 +6,26 @@ export interface Tile {
 	spritePos: Coord;
 }
 
+export interface TileMarkerConfig extends GameObjectConfig {
+	pos: Coord
+	color: TileMarkerColor
+	bobs: boolean
+}
+
 export class TileMarker extends GameObject {
+	static override readonly typeName: string = "TileMarker";
 	color: TileMarkerColor
 	bobs: boolean
 
 	constructor(
-		pos: Coord,
-		color: TileMarkerColor,
-		bobs: boolean,
+		config: TileMarkerConfig
 	) {
-		let y = color.valueOf()
+		let y = config.color.valueOf()
 
-		const config = {
-			drawPos: utils.GridToDraw(pos),
+		config = {
+			...config,
+			type: TileMarker.typeName,
+			drawPos: utils.GridToDraw(config.pos),
 			spriteConfig: {
 				src: "/static/assets/spritesheets/tile_marker.png",
 				cropSize: { width: 16, height: 16 },
@@ -27,14 +34,14 @@ export class TileMarker extends GameObject {
 					idle: [{ frame: { x: 0, y } }],
 					bob: [{ frame: { x: 0, y } }, { frame: { x: 1, y } }],
 				},
-				currentAnim: bobs ? "bob" : "idle",
+				currentAnim: config.bobs ? "bob" : "idle",
 				drawOffset: { x: 0, y: 0 },
 			},
 		};
-		super(config);
+		super(config as GameObjectConfig);
 
-		this.color = color;
-		this.bobs = bobs
+		this.color = config.color;
+		this.bobs = config.bobs
 	}
 	
 	set Coord(val: Coord) {

@@ -1,5 +1,6 @@
 import type { GameObject } from "./GameObject";
-import type { GameObjectClass } from "./types";
+import type { TypeRegistry } from "./TypeRegistry";
+import type { GameObjectClass, TypeId } from "./types";
 
 function* generator() {
 	let id = 0;
@@ -7,64 +8,57 @@ function* generator() {
 }
 
 export default class Id<T extends GameObject = GameObject> {
-	declare private readonly phantomType: T;
+	declare private readonly phantomType: T
 
-	private static idGenerator = generator();
-	private static bookedIds = new Set<number>();
+	// set once at startup, before any Id is created — see note below
+	static registry: TypeRegistry
+
+	private static idGenerator = generator()
+	private static bookedIds = new Set<number>()
 
 	static generateNewId(): number {
-		let id = this.idGenerator.next().value!;
-		while (true) {
-			if (!this.bookedIds.has(id)) return id;
-			else this.bookedIds.delete(id);
-			id = this.idGenerator.next().value!;
+		let id = this.idGenerator.next().value!
+		while (this.bookedIds.has(id)) {
+			id = this.idGenerator.next().value!   // skip forward only — never evict an existing owner
 		}
+		return id
 	}
 
-	static bookId<T extends GameObject>(
-		cls: GameObjectClass<T>,
-		id: number,
-	): Id<T> {
+	static bookId<T extends GameObject>(cls: GameObjectClass<T>, id: number): Id<T> {
 		if (this.bookedIds.has(id)) {
-			console.warn(`Duplicate id requested ${id}`);
+			console.warn(`Duplicate id requested ${id}`)
 		}
-		this.bookedIds.add(id);
-		return new Id<T>(cls.typeName, id);
+		this.bookedIds.add(id)
+		return new Id<T>(cls, id)
 	}
 
 	static create<T extends GameObject>(cls: GameObjectClass<T>): Id<T> {
-		const id = this.generateNewId();
-		this.bookedIds.add(id);
-		return new Id<T>(cls.typeName, id);
+		const id = this.generateNewId()
+		this.bookedIds.add(id)
+		return new Id<T>(cls, id)
 	}
 
 	static releaseId(id: number) {
-		this.bookedIds.delete(id);
+		this.bookedIds.delete(id)
 	}
 
-	value: number;
-	type: string;
+	readonly value: number
+	readonly type: string
+	readonly typeId: TypeId
+	readonly key: bigint
 
-	get key() {
-		return `${this.type}:${this.value}`;
-	}
-
-	constructor(type: string);
-	constructor(type: string, val: number);
-
-	constructor(type: string, val?: number) {
-		if (val !== undefined) {
-			this.value = val;
-			this.type = type;
-		} else {
-			this.type = type;
-			this.value = Id.generateNewId();
-		}
+	private constructor(cls: GameObjectClass<T>, val: number) {
+		this.type = cls.typeName
+		this.typeId = Id.registry.getId(cls)
+		this.value = val
+		// pack typeId (upper 32 bits) and value (lower 32 bits) into one bigint —
+		// cheaper to hash/compare than building and interning a string every time
+		this.key = (BigInt(this.typeId) << 32n) | BigInt(this.value)
 	}
 }
 
 export class IdMap {
-	private map = new Map<string, GameObject>();
+	private map = new Map<BigInt, GameObject>();
 
 	get<T extends GameObject>(id: Id<T>): T | undefined {
 		return this.map.get(id.key) as T | undefined;
@@ -91,15 +85,15 @@ export class IdMap {
 		return this.map.values();
 	}
 
-	entries(): IterableIterator<[string, GameObject]> {
+	entries(): IterableIterator<[BigInt, GameObject]> {
 		return this.map.entries();
 	}
 
 	forEach(
 		callback: (
 			entity: GameObject,
-			key: string,
-			map: Map<string, GameObject>,
+			key: BigInt,
+			map: Map<BigInt, GameObject>,
 		) => void,
 	): void {
 		this.map.forEach(callback);
