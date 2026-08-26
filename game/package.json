@@ -8,12 +8,14 @@
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "alpinejs": "^3.16.3"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@types/alpinejs": "^3.13.11",
     "game-wasm": "file:../wasm_target"
   }
 }
