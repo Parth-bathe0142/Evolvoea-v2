@@ -7,7 +7,7 @@ import { MovableObjectFree, MovableObjectGrid } from "./engine/MovableObject";
 import { TileMarker } from "./engine/scene/Tile";
 import { TypeRegistry } from "./engine/TypeRegistry";
 
-export async function registerTypes() {
+export function registerTypes() {
 	const registry = new TypeRegistry();
 
 	registry.register(GameObject);

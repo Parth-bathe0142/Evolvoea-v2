@@ -6,6 +6,7 @@ export interface PlayerConfig extends GridCharacterConfig {
 }
 
 export class Player extends GridCharacter {
+	static override readonly typeName: string = "Player";
     override facing: GridDirs = 'down'
     override beingControlled: boolean = false
     health: number = 5

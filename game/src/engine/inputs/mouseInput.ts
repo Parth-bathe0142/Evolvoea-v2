@@ -51,4 +51,5 @@ export default class MouseInput {
 }
 
 export class HoverMarker extends TileMarker {
+	static override readonly typeName: string = "HoverMarker";
 }
