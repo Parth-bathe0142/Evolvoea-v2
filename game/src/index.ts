@@ -1,6 +1,6 @@
 import { Scene, type SceneConfig } from "./engine/scene";
 import { registerTypes } from "./registerTypes.js";
-import "./alpineStores.js"
+import "./alpineStores.js";
 
 export async function runGame() {
 	const response = (

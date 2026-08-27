@@ -1,4 +1,5 @@
 import { runGame } from ".";
+import type { Scene } from "./engine/scene";
 
 declare global {
   interface Window {
@@ -12,14 +13,21 @@ type Screens = "title-screen" | "replay-screen" | "game-screen" | "";
 declare module "alpinejs" {
 	interface Stores {
 		gameScreens: GameScreensStore;
+		gameControls: GameControlsStore
 	}
 }
 
-interface GameScreensStore {
+export interface GameScreensStore {
 	screen: Screens;
 	goToGame(): void;
 	goToTitle(): void;
 	goToReplay(): void;
+}
+
+export interface GameControlsStore {
+	scene: Scene
+	pause: () => void,
+	play: () => void,
 }
 
 document.addEventListener('alpine:init', () => {

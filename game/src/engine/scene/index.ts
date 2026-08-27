@@ -37,6 +37,9 @@ export class Scene {
 	pathFinder: PathFinder;
 
 	isPaused: boolean;
+	isReady: boolean = false;
+	readyCallback: (() => void) | undefined
+
 
 	constructor(config: SceneConfig) {
 		this.pathFinder = new PathFinder();
@@ -118,7 +121,18 @@ export class Scene {
 			const { pause, play } = this.time.runLoop(this.update, this.render)!;
 			this.pause = pause;
 			this.play = play;
+
+			this.isReady = true;
+			this.readyCallback?.()
 		}, 500);
+	}
+
+	onReady(cb: () => void) {
+		if (this.isReady) {
+			cb()
+		} else {
+			this.readyCallback = cb
+		}
 	}
 
 	pause?: () => void;
