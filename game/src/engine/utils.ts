@@ -6,80 +6,81 @@ import { MovableObjectFree } from "./MovableObject.js";
  * the program
  */
 export const utils = {
-    /** @return the unit direction from "from" to "to" */
-    getUnitVector(from: Coord, to: Coord): Coord {
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
+	/** @return the unit direction from "from" to "to" */
+	getUnitVector(from: Coord, to: Coord): Coord {
+		const dx = to.x - from.x;
+		const dy = to.y - from.y;
 
-        const magnitude = Math.sqrt(dx * dx + dy * dy);
+		const magnitude = Math.sqrt(dx * dx + dy * dy);
 
-        if (magnitude < 5) {
-            return { x: 0, y: 0 }; // Return a zero vector for target is too close
-        }
+		if (magnitude < 5) {
+			return { x: 0, y: 0 }; // Return a zero vector for target is too close
+		}
 
-        const x = dx / magnitude;
-        const y = dy / magnitude;
+		const x = dx / magnitude;
+		const y = dy / magnitude;
 
-        return { x, y };
-    },
+		return { x, y };
+	},
 
-    /** Converts a grid based coord to a free coord */
-    GridToDraw(coord: Coord): Coord {
-        return { x: coord.x * 16, y: coord.y * 16 }
-    },
-    
-    /** Converts a free coord to a grid based coord */
-    DrawToGrid(coord: Coord): Coord {
-        return { x: Math.floor(coord.x / 16), y: Math.floor(coord.y / 16) }
-    },
+	/** Converts a grid based coord to a free coord */
+	GridToDraw(coord: Coord): Coord {
+		return { x: coord.x * 16, y: coord.y * 16 };
+	},
 
-    /** @returns the euclidean distance between two coords */
-    getDistance(from: Coord, to: Coord): number {
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
+	/** Converts a free coord to a grid based coord */
+	DrawToGrid(coord: Coord): Coord {
+		return { x: Math.floor(coord.x / 16), y: Math.floor(coord.y / 16) };
+	},
 
-        return Math.sqrt(dx * dx + dy * dy);
-    },
+	/** @returns the euclidean distance between two coords */
+	getDistance(from: Coord, to: Coord): number {
+		const dx = to.x - from.x;
+		const dy = to.y - from.y;
 
-    coordToString(coord: Coord) {
-        return `${coord.x},${coord.y}`
-    },
+		return Math.sqrt(dx * dx + dy * dy);
+	},
 
-    stringToCoord(str: string): Coord {
-        const nums = str.split(",").map(Number)
-        return { x: nums[0]!, y: nums[1]! }
-    },
+	coordToString(coord: Coord) {
+		return `${coord.x},${coord.y}`;
+	},
 
-    getNextCoord(curr: Coord, dir: GridDirs): Coord {
-        const next = { ...curr }
-        switch (dir) {
-            case "up":
-                next.y--
-                break;
-            case "right":
-                next.x++
-                break;
-            case "down":
-                next.y++
-                break;
-            case "left":
-                next.x--
-                break;
-        }
-        return next
-    },
+	stringToCoord(str: string): Coord {
+		const nums = str.split(",").map(Number);
+		return { x: nums[0]!, y: nums[1]! };
+	},
 
-    checkCollision(
-        object1: FreeCollider,
-        object2: FreeCollider,
-    ): boolean {
-        let dist = this.getDistance(object1.drawPos, object2.drawPos)
+	getNextCoord(curr: Coord, dir: GridDirs): Coord {
+		const next = { ...curr };
+		switch (dir) {
+			case "up":
+				next.y--;
+				break;
+			case "right":
+				next.x++;
+				break;
+			case "down":
+				next.y++;
+				break;
+			case "left":
+				next.x--;
+				break;
+		}
+		return next;
+	},
 
-        return dist <= (object1.radius + object2.radius)
-    },
+	sameCoords(a: Coord, b: Coord): boolean {
+		return a.x == b.x && a.y == b.y;
+	},
 
-    pathToInstructions(path: string[]) {
-        let instructions: GridDirs[] = []
-        return instructions
-    }
-}
+	checkCollision(object1: FreeCollider, object2: FreeCollider): boolean {
+		let dist = this.getDistance(object1.drawPos, object2.drawPos);
+
+		return dist <= object1.radius + object2.radius;
+	},
+
+	pathToInstructions(path: string[]) {
+		let instructions: GridDirs[] = [];
+		return instructions;
+	},
+};

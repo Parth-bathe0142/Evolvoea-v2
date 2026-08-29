@@ -1,4 +1,5 @@
 import { GameObject, type GameObjectConfig } from "../GameObject.js";
+import type Id from "../IdGenerator.js";
 import { TileMarkerColor, type Coord } from "../types";
 import { utils } from "../utils.js";
 
@@ -16,11 +17,12 @@ export class TileMarker extends GameObject {
 	static override readonly typeName: string = "TileMarker";
 	color: TileMarkerColor
 	bobs: boolean
+	declare id: Id<TileMarker>
 
 	constructor(
 		config: TileMarkerConfig
 	) {
-		let y = config.color.valueOf()
+		let x = config.color.valueOf()
 
 		config = {
 			...config,
@@ -31,8 +33,8 @@ export class TileMarker extends GameObject {
 				cropSize: { width: 16, height: 16 },
 				drawSize: { width: 16, height: 16 },
 				animations: {
-					idle: [{ frame: { x: 0, y } }],
-					bob: [{ frame: { x: 0, y } }, { frame: { x: 1, y } }],
+					idle: [{ frame: { x, y: 0 } }],
+					bob: [{ frame: { x, y: 0 } }, { frame: { x, y: 1 } }],
 				},
 				currentAnim: config.bobs ? "bob" : "idle",
 				drawOffset: { x: 0, y: 0 },
@@ -49,16 +51,19 @@ export class TileMarker extends GameObject {
 	}
 
 	updateSprite(change: Partial<{ color: TileMarkerColor, bobs: boolean }>) {
-		let y = change.color?.valueOf() ?? this.color.valueOf()
+		let x = change.color?.valueOf() ?? this.color.valueOf()
 		let bobs = change.bobs ?? this.bobs
 
 		let newAnimations = {
-			idle: [{ frame: { x: 0, y } }],
-			bob: [{ frame: { x: 0, y } }, { frame: { x: 1, y } }],
+			idle: [{ frame: { x, y: 0 } }],
+			bob: [{ frame: { x, y: 0 } }, { frame: { x, y: 1 } }],
 		}
 
 		this.sprite.animations = newAnimations
 		this.sprite.currentAnimation = bobs ? "bob" : "idle"
 	}
 
+	moveTo(coord: Coord) {
+		this.drawPos = utils.GridToDraw(coord)
+	}
 }

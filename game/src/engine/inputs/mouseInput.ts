@@ -1,3 +1,4 @@
+import type Id from "../IdGenerator.js";
 import type { Scene } from "../scene";
 import type { Camera } from "../scene/Camera";
 import { TileMarker } from "../scene/Tile.js";
@@ -6,6 +7,7 @@ import { utils } from "../utils.js";
 
 export interface MouseInputConfig {
 	scene: Scene
+	tileChangeCallback: (coord: Coord) => void
 }
 
 export default class MouseInput {
@@ -13,11 +15,16 @@ export default class MouseInput {
 	camera: Camera
 	mouseX: number = 0
 	mouseY: number = 0
+
+	hoveredCoord: Coord = { x: 0, y: 0 }
+	
 	private mousemoveListener?: (e: MouseEvent) => void;
+	tileChangeCallback: (coord: Coord) => void;
 
 	constructor(config: MouseInputConfig) {
 		this.scene = config.scene;
 		this.camera = this.scene.camera;
+		this.tileChangeCallback = config.tileChangeCallback
 		this.bindListeners();
 	}
 
@@ -25,6 +32,13 @@ export default class MouseInput {
 		this.scene.canvas.addEventListener("mousemove", this.mousemoveListener = e => {
 			this.mouseX = e.clientX;
 			this.mouseY = e.clientY;
+
+			let newCoord = this.getHoveredCoords()
+			
+			if (!utils.sameCoords(this.hoveredCoord, newCoord)) {
+				this.hoveredCoord = newCoord
+				this.tileChangeCallback(newCoord)
+			}
 		})
 	}
 
@@ -52,4 +66,5 @@ export default class MouseInput {
 
 export class HoverMarker extends TileMarker {
 	static override readonly typeName: string = "HoverMarker";
+	declare id: Id<HoverMarker>
 }

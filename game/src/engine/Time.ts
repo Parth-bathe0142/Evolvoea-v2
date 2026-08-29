@@ -54,6 +54,7 @@ export class Time {
 		const play = (timestamp: number) => {
 			if (!paused) {
 				this.passed += timestamp - this.now;
+				this.passed = Math.min(this.passed, timestamp * 4)
 				this.now = timestamp;
 
 				while (this.passed > this.timeStep) {
@@ -86,7 +87,7 @@ export class Time {
 		this.visibilityListener = () => {
 			if (document.hidden) {
 				if (!paused) {
-					doPause();
+					window.dispatchEvent(new CustomEvent("game_pause"));
 				}
 			}
 		};

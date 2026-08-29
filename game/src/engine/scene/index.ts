@@ -2,13 +2,15 @@ import { Player } from "../entities/Player.js";
 import { Camera } from "./Camera.js";
 import { GameObject, type GameObjectConfig } from "../GameObject.js";
 import KeyInput from "../inputs/KeyInput";
-import { type Coord } from "../types";
+import { TileMarkerColor, type Coord } from "../types";
 import { PathFinder } from "../PathFinder.js";
 import { Time } from "../Time.js";
 import { utils } from "../utils.js";
 import { PixelMap } from "./PixelMap.js";
 import type Id from "../IdGenerator.js";
 import { IdMap } from "../IdGenerator.js";
+import MouseInput, { HoverMarker } from "../inputs/mouseInput.js";
+import { TileMarker, type TileMarkerConfig } from "./Tile.js";
 
 export interface SceneConfig {
 	mapConfig?: {
@@ -24,16 +26,19 @@ export interface SceneConfig {
 export class Scene {
 	ctx: CanvasRenderingContext2D;
 	canvas: HTMLCanvasElement;
+	map: PixelMap;
 
 	characters: Id[] = [];
 	tileMarkers: Id[] = [];
 	entityRefs: IdMap = new IdMap()
-	randomeSpawns = 0;
-	player: Player;
-	map: PixelMap;
+	player: Id<Player>;
+	hoverMarker: Id<HoverMarker>
+	
 	time: Time;
 	camera: Camera;
 	keyInput: KeyInput;
+	mouseInput: MouseInput;
+
 	pathFinder: PathFinder;
 
 	isPaused: boolean;
@@ -47,9 +52,8 @@ export class Scene {
 		this.canvas = document.getElementById("game-canvas")! as HTMLCanvasElement;
 		this.ctx = this.canvas.getContext("2d")!;
 		this.characters = [];
-		this.randomeSpawns = config.randomSpawns ?? 0;
 
-		this.player = new Player({
+		const player = new Player({
 			type: Player.typeName,
 			gridPos: config.playerPos ?? { x: 5, y: 7 },
 			name: "player",
@@ -58,8 +62,30 @@ export class Scene {
 				src: "static/assets/spritesheets/character.png",
 				currentAnim: "idle-down",
 			},
-		});
-		this.addEntity(this.player)
+		})
+		this.addEntity(player)
+
+		this.player = player.id;
+
+		const hoverMarker = new HoverMarker({
+			type: HoverMarker.typeName,
+			pos: config.playerPos ?? { x: 5, y: 7 },
+			color: TileMarkerColor.Red,
+			bobs: true,
+		} as TileMarkerConfig)
+		this.addEntity(hoverMarker)
+
+		const tileMarker = new TileMarker({
+			type: HoverMarker.typeName,
+			pos: config.playerPos ?? { x: 5, y: 7 },
+			color: TileMarkerColor.Blue,
+			bobs: false,
+		} as TileMarkerConfig)
+
+		this.addEntity(tileMarker);
+		this.characters.push(tileMarker.id)
+		
+		this.hoverMarker = hoverMarker.id as Id<HoverMarker>;
 
 		if (config.mapConfig) {
 			this.map = new PixelMap(
@@ -73,9 +99,10 @@ export class Scene {
 		this.time = new Time(48);
 		this.camera = new Camera({
 			scene: this,
-			entity: this.player.id,
+			entity: this.player,
 		});
-		this.keyInput = new KeyInput({ puppet: this.player.id, scene: this });
+		this.keyInput = new KeyInput({ puppet: this.player, scene: this });
+		this.mouseInput = new MouseInput({ scene: this, tileChangeCallback: this.hoveredTileChange })
 
 		this.isPaused = false;
 
@@ -88,7 +115,9 @@ export class Scene {
 	}
 
 	update = () => {
-		this.player.update();
+		this.getEntityById(this.player)?.update();
+		this.getEntityById(this.hoverMarker)?.update();
+		
 		this.characters.forEach((id) => {
 			this.getEntityById(id)?.update();
 		});
@@ -110,7 +139,9 @@ export class Scene {
 			this.getEntityById(id)?.sprite.draw(this.ctx, gameState);
 		}
 
-		this.player.sprite.draw(this.ctx, gameState);
+		this.getEntityById(this.player)?.sprite.draw(this.ctx, gameState);
+		this.getEntityById(this.hoverMarker)?.sprite.draw(this.ctx, gameState);
+		
 		this.map.drawLayer(this.ctx, gameState, "Roof");
 	};
 
@@ -159,6 +190,10 @@ export class Scene {
 		} else {
 			return false;
 		}
+	}
+
+	hoveredTileChange = (coord: Coord) => {
+		this.getEntityById(this.hoverMarker)?.moveTo(coord)
 	}
 
 	getEntityById<T extends GameObject>(id: Id<T>): T | undefined {
