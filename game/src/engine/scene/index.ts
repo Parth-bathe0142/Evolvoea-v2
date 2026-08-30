@@ -11,6 +11,7 @@ import type Id from "../IdGenerator.js";
 import { IdMap } from "../IdGenerator.js";
 import MouseInput, { HoverMarker } from "../inputs/mouseInput.js";
 import { TileMarker, type TileMarkerConfig } from "./Tile.js";
+import type { GridCharacter } from "../entities/GridCharacter.js";
 
 export interface SceneConfig {
 	mapConfig?: {
@@ -28,7 +29,7 @@ export class Scene {
 	canvas: HTMLCanvasElement;
 	map: PixelMap;
 
-	characters: Id[] = [];
+	characters: Id<GridCharacter>[] = [];
 	tileMarkers: Id[] = [];
 	entityRefs: IdMap = new IdMap()
 	player: Id<Player>;
@@ -64,26 +65,18 @@ export class Scene {
 			},
 		})
 		this.addEntity(player)
-
+		
 		this.player = player.id;
+		this.characters.push(this.player)
 
 		const hoverMarker = new HoverMarker({
 			type: HoverMarker.typeName,
-			pos: config.playerPos ?? { x: 5, y: 7 },
+			pos: { x: 0, y: 0 },
 			color: TileMarkerColor.Red,
 			bobs: true,
 		} as TileMarkerConfig)
 		this.addEntity(hoverMarker)
-
-		const tileMarker = new TileMarker({
-			type: HoverMarker.typeName,
-			pos: config.playerPos ?? { x: 5, y: 7 },
-			color: TileMarkerColor.Blue,
-			bobs: false,
-		} as TileMarkerConfig)
-
-		this.addEntity(tileMarker);
-		this.characters.push(tileMarker.id)
+		this.tileMarkers.push(hoverMarker.id)
 		
 		this.hoverMarker = hoverMarker.id as Id<HoverMarker>;
 
@@ -115,12 +108,14 @@ export class Scene {
 	}
 
 	update = () => {
-		this.getEntityById(this.player)?.update();
-		this.getEntityById(this.hoverMarker)?.update();
-		
 		this.characters.forEach((id) => {
 			this.getEntityById(id)?.update();
 		});
+		
+		this.tileMarkers.forEach((id) => {
+			this.getEntityById(id)?.update();
+		});
+		
 	};
 
 	render = () => {
@@ -138,9 +133,10 @@ export class Scene {
 		for (const id of this.characters) {
 			this.getEntityById(id)?.sprite.draw(this.ctx, gameState);
 		}
-
-		this.getEntityById(this.player)?.sprite.draw(this.ctx, gameState);
-		this.getEntityById(this.hoverMarker)?.sprite.draw(this.ctx, gameState);
+		
+		for (const id of this.tileMarkers) {
+			this.getEntityById(id)?.sprite.draw(this.ctx, gameState);
+		}
 		
 		this.map.drawLayer(this.ctx, gameState, "Roof");
 	};
@@ -194,6 +190,16 @@ export class Scene {
 
 	hoveredTileChange = (coord: Coord) => {
 		this.getEntityById(this.hoverMarker)?.moveTo(coord)
+		
+		const entity = this.characters.find(id => utils.sameCoords(this.getEntityById(id)!.gridPos, coord))
+
+		let record = null
+		if (entity) {
+			const data = this.getEntityById(entity)!.inspect()
+			record = utils.inspectionToRecord(data)
+		}
+
+		Alpine.store("inspector").data = record
 	}
 
 	getEntityById<T extends GameObject>(id: Id<T>): T | undefined {

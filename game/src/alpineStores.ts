@@ -12,8 +12,8 @@ type Screens = "title-screen" | "replay-screen" | "game-screen" | "";
 
 declare module "alpinejs" {
 	interface Stores {
-		gameScreens: GameScreensStore;
-		gameControls: GameControlsStore
+		gameScreens: GameScreensStore
+		inspector: InspectorStore
 	}
 }
 
@@ -24,10 +24,8 @@ export interface GameScreensStore {
 	goToReplay(): void;
 }
 
-export interface GameControlsStore {
-	scene: Scene
-	pause: () => void,
-	play: () => void,
+export interface InspectorStore {
+	data: Record<string, string> | null
 }
 
 document.addEventListener('alpine:init', () => {
@@ -47,7 +45,9 @@ document.addEventListener('alpine:init', () => {
 		goToReplay() {
 			this.screen = "replay-screen";
 		},
-	} satisfies GameScreensStore);
+	});
+
+	Alpine.store("inspector", { data: null })
 });
 
 window.addEventListener("load", () => {

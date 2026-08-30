@@ -1,10 +1,10 @@
 import type Id from "../IdGenerator.js";
-import type { GridDirs } from "../types";
+import type { GridDirs, Inspectable, InspectionData } from "../types";
 import { GridCharacter, type GridCharacterConfig } from "./GridCharacter.js";
 
 export interface PlayerConfig extends GridCharacterConfig {}
 
-export class Player extends GridCharacter {
+export class Player extends GridCharacter implements Inspectable {
 	static override readonly typeName: string = "Player";
 
 	declare id: Id<Player>;
@@ -76,5 +76,13 @@ export class Player extends GridCharacter {
 		setTimeout(() => {
 			!this.movingTo && (this.sprite.currentAnimation = `bob-${this.facing}`);
 		}, 10);
+	}
+
+	override inspect(): InspectionData {
+		let data = super.inspect()
+		return {
+			...data,
+			type: Player.typeName
+		}
 	}
 }

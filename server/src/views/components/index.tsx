@@ -3,7 +3,7 @@ import type { FC } from "hono/jsx";
 export const GameScreen: FC = () => (
 	<div
 		id="game-screen"
-		class="ui absolute inset-0 grid grid-cols-[20%_60%_20%] items-start"
+		class="ui absolute inset-0 grid grid-cols-[20%_60%_20%] items-start gap-1"
 		x-data="{ paused: false }"
 		x-on:game_play="paused = false"
 		x-on:game_pause="paused = true"
@@ -11,17 +11,17 @@ export const GameScreen: FC = () => (
 		x-cloak
 	>
 		{/* Left */}
-		<div class="z-10 flex flex-col items-start gap-1 p-2">
-			<button class="p-1 border-[#ffcc00] border-2 bg-[#ff4500]" x-on:click="$dispatch('game_pause')" x-show="!paused">
+		<div class="z-10 flex flex-col items-start gap-1 h-full w-full p-2 border-2 border-gray-400">
+			<button class="w-20 p-1 border-[#ffcc00] border-2 bg-[#ff4500]" x-on:click="$dispatch('game_pause')" x-show="!paused">
 				pause
 			</button>
-			<button class="p-1 border-[#ffcc00] border-2 bg-[#ff4500]" x-on:click="$dispatch('game_play')" x-show="paused">
+			<button class="w-20 p-1 border-[#ffcc00] border-2 bg-[#ff4500]" x-on:click="$dispatch('game_play')" x-show="paused">
 				play
 			</button>
 		</div>
 
 		{/* Center */}
-		<div class="flex h-full w-full items-center justify-center overflow-hidden">
+		<div class="flex h-full w-full items-center justify-center overflow-hidden border-2 border-gray-400">
 			<canvas
 				id="game-canvas"
 				width="400"
@@ -31,11 +31,24 @@ export const GameScreen: FC = () => (
 		</div>
 
 		{/* Right */}
-		<div class="z-10 flex flex-col items-end gap-1 p-2">
+		<div class="z-10 flex flex-col items-end gap-1 h-full w-full p-2 border-2 border-gray-400">
 			<div
 				id="health-bar"
 				class="m-1.25 flex w-fit flex-row gap-0.5 [image-rendering:pixelated]"
 			/>
+			<div
+					id="inspector-panel"
+					class="w-full flex flex-col gap-0.5 bg-black/70 text-[10px] text-white p-2 border border-gray-400"
+					x-show="$store.inspector.data !== null"
+					x-cloak
+				>
+					<template x-for="[key, value] in Object.entries($store.inspector.data ?? {})" x-bind:key="key">
+						<div class="flex justify-between gap-2">
+							<span class="opacity-70" x-text="key"></span>
+							<span x-text="value"></span>
+						</div>
+					</template>
+				</div>
 		</div>
 	</div>
 );

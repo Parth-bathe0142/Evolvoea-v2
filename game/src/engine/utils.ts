@@ -1,4 +1,4 @@
-import type { Coord, FreeCollider, GridDirs } from "./types";
+import type { Coord, FreeCollider, GridDirs, InspectionData } from "./types";
 import { MovableObjectFree } from "./MovableObject.js";
 
 /**
@@ -83,4 +83,13 @@ export const utils = {
 		let instructions: GridDirs[] = [];
 		return instructions;
 	},
+
+	inspectionToRecord(data: InspectionData) {
+		return {
+			id: data.id.key.toString(),
+			type: data.type,
+			gridPos: this.coordToString(data.gridPos),
+			...data.extra
+		}
+	}
 };

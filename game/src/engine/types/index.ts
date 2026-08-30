@@ -1,6 +1,7 @@
 // very small and universal definitions are kept in a seperate file
 
 import type { GameObject } from "../GameObject"
+import type Id from "../IdGenerator"
 import { Time } from "../Time"
 import { Camera } from "../scene/Camera"
 
@@ -48,6 +49,17 @@ export interface PuppetCommand {
     direction: GridDirs
     duration?: number
     retry?: boolean
+}
+
+export interface Inspectable {
+	inspect: () => InspectionData
+}
+
+export interface InspectionData {
+	id: Id
+	gridPos: Coord
+	type: string
+	extra?: Record<string, string>
 }
 
 export interface Save {
