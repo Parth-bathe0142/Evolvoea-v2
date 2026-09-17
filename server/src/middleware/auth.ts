@@ -1,5 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { getCookie } from "hono/cookie";
+
 import { getSession } from "../lib/auth";
 import type { User } from "../db";
 
@@ -12,14 +13,17 @@ function redirectToLogin(c: any) {
     c.header("HX-Redirect", "/login");
     return c.body(null, 200);
   }
+
   return c.redirect("/login");
 }
 
-
 export const requireAuth = createMiddleware<{
-  Variables: { user: User };
+  Variables: {
+    user: User;
+  };
 }>(async (c, next) => {
   const sessionId = getCookie(c, "session_id");
+
   const user = sessionId ? getSession(sessionId) : null;
 
   if (!user) {
@@ -27,14 +31,20 @@ export const requireAuth = createMiddleware<{
   }
 
   c.set("user", user);
+
   await next();
 });
 
-
 export const optionalAuth = createMiddleware<{
-  Variables: { user: User | null };
+  Variables: {
+    user: User | null;
+  };
 }>(async (c, next) => {
   const sessionId = getCookie(c, "session_id");
-  c.set("user", sessionId ? getSession(sessionId) : null);
+
+  const user = sessionId ? getSession(sessionId) : null;
+
+  c.set("user", user);
+
   await next();
 });
