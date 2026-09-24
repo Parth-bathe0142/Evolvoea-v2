@@ -6,11 +6,11 @@
       "name": "game",
       "dependencies": {
         "@types/alpinejs": "^3.13.11",
-        "alpinejs": "^3.16.3",
         "game-wasm": "file:../wasm_target",
       },
       "devDependencies": {
         "@types/bun": "latest",
+        "alpinejs": "^3.16.3",
       },
       "peerDependencies": {
         "typescript": "^5",

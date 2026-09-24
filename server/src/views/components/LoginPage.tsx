@@ -1,5 +1,5 @@
-// server/src/views/components/LoginPage.tsx
-
+// The reusable form fragment — this is what HTMX swaps back in on error,
+// so it needs to stand alone (no <html>/<head>).
 export function LoginForm({
   error,
   username,
@@ -16,77 +16,69 @@ export function LoginForm({
       hx-target="#login-form"
       hx-swap="outerHTML"
       hx-indicator="#login-spinner"
-      class="rpg-form"
+      class="flex flex-col gap-4"
       x-data="{ showPassword: false }"
     >
       {error && (
-        <div class="form-error">
-          <span>⚠</span>
-          <span>{error}</span>
-        </div>
+        <p class="border-2 border-red-500 bg-red-950/60 text-red-300 text-sm px-3 py-2 rounded">
+          {error}
+        </p>
       )}
 
-      <div class="field">
-        <label for="username">
+      <div class="flex flex-col gap-1">
+        <label class="text-[#ffcc00] text-xs uppercase tracking-wider" for="username">
           Username
         </label>
-
-        <div class="input-wrapper">
-          <span class="input-icon">♟</span>
-
-          <input
-            id="username"
-            name="username"
-            type="text"
-            required
-            autofocus
-            autocomplete="username"
-            placeholder="Enter your username"
-            value={username ?? ""}
-          />
-        </div>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          required
+          autofocus
+          value={username ?? ""}
+          placeholder="your_username"
+          class="bg-black border-2 border-[#ffcc00]/50 text-white rounded px-3 py-2 outline-none focus:border-[#ffcc00] placeholder:text-gray-600 transition-colors"
+        />
       </div>
 
-      <div class="field">
-        <label for="password">
+      <div class="flex flex-col gap-1">
+        <label class="text-[#ffcc00] text-xs uppercase tracking-wider" for="password">
           Password
         </label>
-
-        <div class="input-wrapper">
-          <span class="input-icon">◆</span>
-
+        <div class="relative">
           <input
             id="password"
             name="password"
             required
-            autocomplete="current-password"
-            placeholder="Enter your password"
+            placeholder="••••••••"
             x-bind:type="showPassword ? 'text' : 'password'"
+            class="bg-black border-2 border-[#ffcc00]/50 text-white rounded px-3 py-2 w-full outline-none focus:border-[#ffcc00] placeholder:text-gray-600 transition-colors"
           />
-
           <button
             type="button"
-            class="show-password"
             x-on:click="showPassword = !showPassword"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-[#ffcc00]/70 text-xs font-bold uppercase hover:text-[#ffcc00]"
           >
             <span x-text="showPassword ? 'Hide' : 'Show'"></span>
           </button>
         </div>
       </div>
 
-      <button type="submit" class="rpg-button">
-        <span class="button-slime">●</span>
-        <span>Log In</span>
-
+      <button
+        type="submit"
+        class="mt-2 rounded-lg border-2 border-[#ffcc00] bg-[#ff4500] px-6 py-3 text-lg font-bold text-white transition hover:bg-[#ffcc00] hover:text-black flex items-center justify-center gap-2"
+      >
+        <span>Log in</span>
         <span
           id="login-spinner"
-          class="htmx-indicator spinner"
+          class="htmx-indicator animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"
         ></span>
       </button>
     </form>
   );
 }
 
+// The full page — used for the initial GET /login load.
 export function LoginPage({
   error,
   username,
@@ -98,147 +90,48 @@ export function LoginPage({
     <html>
       <head>
         <meta charset="UTF-8" />
-
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
-        />
-
-        <title>Evolvoea — Login</title>
-
+        <title>Log in — Evolvoea</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
         <link
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
           rel="stylesheet"
-          href="/static/style.css"
         />
-
+        <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-
         <script
           defer
           src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"
         ></script>
-
         <style>{`
-          .htmx-indicator {
-            display: none;
-          }
-
-          .htmx-request .htmx-indicator,
-          .htmx-request.htmx-indicator {
-            display: inline-block;
-          }
-
-          [x-cloak] {
-            display: none !important;
-          }
+          .pixel-font { font-family: 'Press Start 2P', monospace; }
+          .htmx-indicator { opacity: 0; }
+          .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+          [x-cloak] { display: none !important; }
         `}</style>
       </head>
+      <body class="bg-black min-h-screen flex items-center justify-center text-white">
+        <div class="w-full max-w-sm border-2 border-[#ffcc00] bg-black/80 rounded-lg p-8 shadow-[0_0_25px_rgba(255,204,0,0.15)]">
+          <h1 class="pixel-font text-[#ffcc00] text-lg text-center mb-2 tracking-widest">
+            EVOLVOEA
+          </h1>
+          <p class="text-center text-gray-400 text-sm mb-6">Log in to continue</p>
 
-      <body class="rpg-auth-page">
+          <LoginForm error={error} username={username} />
 
-        {/* Decorative background elements */}
-        <div class="forest-glow glow-one"></div>
-        <div class="forest-glow glow-two"></div>
+          <p class="text-gray-400 text-sm mt-6 text-center">
+            No account?{" "}
+            <a href="/signup" class="text-[#ffcc00] hover:underline font-semibold">
+              Sign up
+            </a>
+          </p>
 
-        <div class="pixel-particles">
-          <span>✦</span>
-          <span>•</span>
-          <span>✦</span>
-          <span>•</span>
-          <span>✦</span>
+          <div class="mt-4 text-center">
+            <a href="/" class="text-xs text-gray-500 hover:text-[#ffcc00] transition-colors">
+              ← Back to home
+            </a>
+          </div>
         </div>
-
-        <main class="auth-layout">
-
-          {/* LEFT DECORATION */}
-          <section class="auth-intro">
-
-            <div class="character-stage">
-  <div class="bunny-character" aria-label="Evolvoea bunny"></div>
-</div>
-
-            <h1 class="game-logo">
-              EVOLVOEA
-            </h1>
-
-            <p class="game-tagline">
-              EXPLORE · SURVIVE · EVOLVE
-            </p>
-
-            <div class="game-message">
-              <span class="message-icon">♥</span>
-
-              <div>
-                <strong>A new adventure awaits.</strong>
-
-                <p>
-                  Enter Into Endless Adventure Of Evolvoea
-                  <br />
-                  Are you ready?
-                </p>
-              </div>
-            </div>
-
-          </section>
-
-
-          {/* LOGIN CARD */}
-          <section class="auth-card">
-
-            <div class="card-corner corner-tl">❧</div>
-            <div class="card-corner corner-tr">❧</div>
-            <div class="card-corner corner-bl">❧</div>
-            <div class="card-corner corner-br">❧</div>
-
-            <div class="auth-card-header">
-
-              <div class="mini-slime">
-                ●
-              </div>
-
-              <h2>
-                Welcome Back
-              </h2>
-
-              <p>
-                Continue your journey in Evolvoea.
-              </p>
-
-            </div>
-
-            <div class="divider">
-              <span></span>
-              <b>◆</b>
-              <span></span>
-            </div>
-
-            <LoginForm
-              error={error}
-              username={username}
-            />
-
-            <div class="auth-switch">
-
-              <span>
-                Don't have an account?
-              </span>
-
-              <a href="/signup">
-                Sign up
-                <span class="leaf"> ❧</span>
-              </a>
-
-            </div>
-
-
-          </section>
-
-        </main>
-
-        <div class="auth-footer">
-          <span>EVOLVOEA</span>
-        </div>
-
       </body>
     </html>
   );

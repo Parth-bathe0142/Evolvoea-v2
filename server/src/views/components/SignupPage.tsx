@@ -1,5 +1,4 @@
-// server/src/views/components/SignupPage.tsx
-
+// The reusable form fragment — this is what HTMX swaps back in on error.
 export function SignupForm({
   error,
   username,
@@ -18,111 +17,88 @@ export function SignupForm({
       hx-target="#signup-form"
       hx-swap="outerHTML"
       hx-indicator="#signup-spinner"
-      class="rpg-form"
-      x-data="{
-        password: '',
-        confirm: '',
-        showPassword: false
-      }"
+      class="flex flex-col gap-4"
+      x-data="{ password: '', confirm: '', showPassword: false }"
     >
       {error && (
-        <div class="form-error">
-          <span>⚠</span>
-          <span>{error}</span>
-        </div>
+        <p class="border-2 border-red-500 bg-red-950/60 text-red-300 text-sm px-3 py-2 rounded">
+          {error}
+        </p>
       )}
 
-      <div class="field">
-        <label for="username">Username</label>
-
-        <div class="input-wrapper">
-          <span class="input-icon">♟</span>
-
-          <input
-            id="username"
-            name="username"
-            type="text"
-            required
-            autofocus
-            autocomplete="username"
-            placeholder="Choose a username"
-            value={username ?? ""}
-          />
-        </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-[#ffcc00] text-xs uppercase tracking-wider" for="username">
+          Username
+        </label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          required
+          autofocus
+          value={username ?? ""}
+          placeholder="your_username"
+          class="bg-black border-2 border-[#ffcc00]/50 text-white rounded px-3 py-2 outline-none focus:border-[#ffcc00] placeholder:text-gray-600 transition-colors"
+        />
       </div>
 
-      <div class="field">
-        <label for="email">Email</label>
-
-        <div class="input-wrapper">
-          <span class="input-icon">@</span>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            autocomplete="email"
-            placeholder="your@email.com"
-            value={email ?? ""}
-          />
-        </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-[#ffcc00] text-xs uppercase tracking-wider" for="email">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          value={email ?? ""}
+          placeholder="you@example.com"
+          class="bg-black border-2 border-[#ffcc00]/50 text-white rounded px-3 py-2 outline-none focus:border-[#ffcc00] placeholder:text-gray-600 transition-colors"
+        />
       </div>
 
-      <div class="field">
-        <label for="password">Password</label>
-
-        <div class="input-wrapper">
-          <span class="input-icon">◆</span>
-
+      <div class="flex flex-col gap-1">
+        <label class="text-[#ffcc00] text-xs uppercase tracking-wider" for="password">
+          Password
+        </label>
+        <div class="relative">
           <input
             id="password"
             name="password"
             required
             minlength={8}
-            autocomplete="new-password"
-            placeholder="Create a password"
+            placeholder="••••••••"
             x-model="password"
             x-bind:type="showPassword ? 'text' : 'password'"
+            class="bg-black border-2 border-[#ffcc00]/50 text-white rounded px-3 py-2 w-full outline-none focus:border-[#ffcc00] placeholder:text-gray-600 transition-colors"
           />
-
           <button
             type="button"
-            class="show-password"
             x-on:click="showPassword = !showPassword"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-[#ffcc00]/70 text-xs font-bold uppercase hover:text-[#ffcc00]"
           >
             <span x-text="showPassword ? 'Hide' : 'Show'"></span>
           </button>
         </div>
-
-        <span class="field-hint">
-          At least 8 characters
-        </span>
+        <span class="text-gray-500 text-xs">At least 8 characters</span>
       </div>
 
-      <div class="field">
-        <label for="confirm">Confirm password</label>
-
-        <div class="input-wrapper">
-          <span class="input-icon">◆</span>
-
-          <input
-            id="confirm"
-            type="password"
-            required
-            autocomplete="new-password"
-            placeholder="Repeat your password"
-            x-model="confirm"
-            x-bind:class="
-              confirm && confirm !== password
-                ? 'input-invalid'
-                : ''
-            "
-          />
-        </div>
-
+      <div class="flex flex-col gap-1">
+        <label class="text-[#ffcc00] text-xs uppercase tracking-wider" for="confirm">
+          Confirm password
+        </label>
+        {/* Client-side check only — no name attribute, so it's never sent to the server */}
+        <input
+          id="confirm"
+          type="password"
+          required
+          placeholder="••••••••"
+          x-model="confirm"
+          x-bind:class="confirm && confirm !== password ? 'border-red-500' : 'border-[#ffcc00]/50'"
+          class="bg-black border-2 text-white rounded px-3 py-2 outline-none focus:border-[#ffcc00] placeholder:text-gray-600 transition-colors"
+        />
         <span
-          class="field-hint password-warning"
+          class="text-red-400 text-xs"
           x-show="confirm && confirm !== password"
           x-cloak
         >
@@ -132,34 +108,21 @@ export function SignupForm({
 
       <button
         type="submit"
-        class="rpg-button"
-        x-bind:disabled="
-          confirm !== '' && confirm !== password
-        "
-        x-bind:class="
-          confirm !== '' && confirm !== password
-            ? 'button-disabled'
-            : ''
-        "
+        x-bind:disabled="confirm !== '' && confirm !== password"
+        x-bind:class="confirm !== '' && confirm !== password ? 'opacity-40 cursor-not-allowed' : ''"
+        class="mt-2 rounded-lg border-2 border-[#ffcc00] bg-[#ff4500] px-6 py-3 text-lg font-bold text-white transition hover:bg-[#ffcc00] hover:text-black flex items-center justify-center gap-2"
       >
-        <span class="button-slime">
-          ●
-        </span>
-
-        <span>
-          Create Character
-        </span>
-
+        <span>Sign up</span>
         <span
           id="signup-spinner"
-          class="htmx-indicator spinner"
+          class="htmx-indicator animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"
         ></span>
       </button>
     </form>
   );
 }
 
-
+// The full page — used for the initial GET /signup load.
 export function SignupPage({
   error,
   username,
@@ -173,162 +136,48 @@ export function SignupPage({
     <html>
       <head>
         <meta charset="UTF-8" />
-
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
-        />
-
-        <title>Evolvoea — Create Account</title>
-
+        <title>Sign up — Evolvoea</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
         <link
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
           rel="stylesheet"
-          href="/static/style.css"
         />
-
+        <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-
         <script
           defer
           src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"
         ></script>
-
         <style>{`
-          .htmx-indicator {
-            display: none;
-          }
-
-          .htmx-request .htmx-indicator,
-          .htmx-request.htmx-indicator {
-            display: inline-block;
-          }
-
-          [x-cloak] {
-            display: none !important;
-          }
+          .pixel-font { font-family: 'Press Start 2P', monospace; }
+          .htmx-indicator { opacity: 0; }
+          .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+          [x-cloak] { display: none !important; }
         `}</style>
       </head>
+      <body class="bg-black min-h-screen flex items-center justify-center text-white">
+        <div class="w-full max-w-sm border-2 border-[#ffcc00] bg-black/80 rounded-lg p-8 shadow-[0_0_25px_rgba(255,204,0,0.15)]">
+          <h1 class="pixel-font text-[#ffcc00] text-lg text-center mb-2 tracking-widest">
+            EVOLVOEA
+          </h1>
+          <p class="text-center text-gray-400 text-sm mb-6">Create your account</p>
 
-      <body class="rpg-auth-page">
+          <SignupForm error={error} username={username} email={email} />
 
-        <div class="forest-glow glow-one"></div>
-        <div class="forest-glow glow-two"></div>
+          <p class="text-gray-400 text-sm mt-6 text-center">
+            Already have an account?{" "}
+            <a href="/login" class="text-[#ffcc00] hover:underline font-semibold">
+              Log in
+            </a>
+          </p>
 
-        <div class="pixel-particles">
-          <span>✦</span>
-          <span>•</span>
-          <span>✦</span>
-          <span>•</span>
-          <span>✦</span>
+          <div class="mt-4 text-center">
+            <a href="/" class="text-xs text-gray-500 hover:text-[#ffcc00] transition-colors">
+              ← Back to home
+            </a>
+          </div>
         </div>
-
-        <main class="auth-layout">
-
-          <section class="auth-intro">
-
-            <div class="character-stage">
-              <div class="character-shadow"></div>
-              <div class="bunny-character"></div>
-            </div>
-
-            <h1 class="game-logo">
-              EVOLVOEA
-            </h1>
-
-            <p class="game-tagline">
-              EXPLORE · SURVIVE · EVOLVE
-            </p>
-
-            <div class="game-message">
-
-              <span class="message-icon">
-                ✦
-              </span>
-
-              <div>
-                <strong>
-                  Begin your adventure.
-                </strong>
-
-                <p>
-                  Enter the world.
-                  <br />
-                  Discover. Battle. Evolve.
-                </p>
-              </div>
-
-            </div>
-
-          </section>
-
-
-          <section class="auth-card signup-card">
-
-            <div class="card-corner corner-tl">❧</div>
-            <div class="card-corner corner-tr">❧</div>
-            <div class="card-corner corner-bl">❧</div>
-            <div class="card-corner corner-br">❧</div>
-
-            <div class="auth-card-header">
-
-              <div class="mini-slime">
-                ●
-              </div>
-
-              <h2>
-                Create Your Character
-              </h2>
-
-              <p>
-                Your journey begins here.
-              </p>
-
-            </div>
-
-
-            <div class="divider">
-              <span></span>
-              <b>◆</b>
-              <span></span>
-            </div>
-
-
-            <SignupForm
-              error={error}
-              username={username}
-              email={email}
-            />
-
-
-            <div class="auth-switch">
-
-              <span>
-                Already have an account?
-              </span>
-
-              <a href="/login">
-                Log in
-                <span class="leaf">
-                  ❧
-                </span>
-              </a>
-
-            </div>
-
-
-            <div class="card-footer"></div>
-
-          </section>
-
-        </main>
-
-
-        <div class="auth-footer">
-          <span>EVOLVOEA</span>
-          <span>•</span>
-          <span>A BRIGHTER ECOSYSTEM</span>
-        </div>
-
       </body>
     </html>
   );

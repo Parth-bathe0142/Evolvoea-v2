@@ -161,14 +161,14 @@ authRoutes.post("/signup", async (c) => {
   if (isHtmx(c)) {
     c.header(
       "HX-Redirect",
-      "/game"
+      "/login"
     );
 
     return c.body(null, 200);
   }
 
 
-  return c.redirect("/game");
+  return c.redirect("/login");
 });
 
 
