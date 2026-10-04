@@ -12,6 +12,7 @@ import { IdMap } from "../IdGenerator.js";
 import MouseInput, { HoverMarker } from "../inputs/mouseInput.js";
 import { TileMarker, type TileMarkerConfig } from "./Tile.js";
 import type { GridCharacter } from "../entities/GridCharacter.js";
+import { Diamond } from "../entities/items/Diamond.js";
 
 export interface SceneConfig {
 	mapConfig?: {
@@ -31,10 +32,11 @@ export class Scene {
 
 	characters: Id<GridCharacter>[] = [];
 	tileMarkers: Id[] = [];
-	entityRefs: IdMap = new IdMap()
+	items: Id[] = [];
+	entityRefs: IdMap = new IdMap();
 	player: Id<Player>;
-	hoverMarker: Id<HoverMarker>
-	
+	hoverMarker: Id<HoverMarker>;
+
 	time: Time;
 	camera: Camera;
 	keyInput: KeyInput;
@@ -44,8 +46,7 @@ export class Scene {
 
 	isPaused: boolean;
 	isReady: boolean = false;
-	readyCallback: (() => void) | undefined
-
+	readyCallback: (() => void) | undefined;
 
 	constructor(config: SceneConfig) {
 		this.pathFinder = new PathFinder();
@@ -63,22 +64,27 @@ export class Scene {
 				src: "static/assets/spritesheets/character.png",
 				currentAnim: "idle-down",
 			},
-		})
-		this.addEntity(player)
-		
+		});
+		this.addEntity(player);
+
 		this.player = player.id;
-		this.characters.push(this.player)
+		this.characters.push(this.player);
 
 		const hoverMarker = new HoverMarker({
 			type: HoverMarker.typeName,
 			pos: { x: 0, y: 0 },
 			color: TileMarkerColor.Red,
 			bobs: true,
-		} as TileMarkerConfig)
-		this.addEntity(hoverMarker)
-		this.tileMarkers.push(hoverMarker.id)
-		
+		} as TileMarkerConfig);
+		this.addEntity(hoverMarker);
+		this.tileMarkers.push(hoverMarker.id);
+
 		this.hoverMarker = hoverMarker.id as Id<HoverMarker>;
+
+		const diamond = Diamond.drop(
+			utils.addCoords(config.playerPos ?? { x: 5, y: 7 }, { x: 2, y: 2 }),
+			this,
+		);
 
 		if (config.mapConfig) {
 			this.map = new PixelMap(
@@ -95,7 +101,10 @@ export class Scene {
 			entity: this.player,
 		});
 		this.keyInput = new KeyInput({ puppet: this.player, scene: this });
-		this.mouseInput = new MouseInput({ scene: this, tileChangeCallback: this.hoveredTileChange })
+		this.mouseInput = new MouseInput({
+			scene: this,
+			tileChangeCallback: this.hoveredTileChange,
+		});
 
 		this.isPaused = false;
 
@@ -111,11 +120,14 @@ export class Scene {
 		this.characters.forEach((id) => {
 			this.getEntityById(id)?.update();
 		});
-		
+
+		this.items.forEach((id) => {
+			this.getEntityById(id)?.update();
+		});
+
 		this.tileMarkers.forEach((id) => {
 			this.getEntityById(id)?.update();
 		});
-		
 	};
 
 	render = () => {
@@ -133,11 +145,15 @@ export class Scene {
 		for (const id of this.characters) {
 			this.getEntityById(id)?.sprite.draw(this.ctx, gameState);
 		}
-		
+
+		for (const id of this.items) {
+			this.getEntityById(id)?.sprite.draw(this.ctx, gameState);
+		}
+
 		for (const id of this.tileMarkers) {
 			this.getEntityById(id)?.sprite.draw(this.ctx, gameState);
 		}
-		
+
 		this.map.drawLayer(this.ctx, gameState, "Roof");
 	};
 
@@ -150,15 +166,15 @@ export class Scene {
 			this.play = play;
 
 			this.isReady = true;
-			this.readyCallback?.()
+			this.readyCallback?.();
 		}, 500);
 	}
 
 	onReady(cb: () => void) {
 		if (this.isReady) {
-			cb()
+			cb();
 		} else {
-			this.readyCallback = cb
+			this.readyCallback = cb;
 		}
 	}
 
@@ -189,18 +205,20 @@ export class Scene {
 	}
 
 	hoveredTileChange = (coord: Coord) => {
-		this.getEntityById(this.hoverMarker)?.moveTo(coord)
-		
-		const entity = this.characters.find(id => utils.sameCoords(this.getEntityById(id)!.gridPos, coord))
+		this.getEntityById(this.hoverMarker)?.moveTo(coord);
 
-		let record = null
+		const entity = this.characters.find((id) =>
+			utils.sameCoords(this.getEntityById(id)!.gridPos, coord),
+		);
+
+		let record = null;
 		if (entity) {
-			const data = this.getEntityById(entity)!.inspect()
-			record = utils.inspectionToRecord(data)
+			const data = this.getEntityById(entity)!.inspect();
+			record = utils.inspectionToRecord(data);
 		}
 
-		Alpine.store("inspector").data = record
-	}
+		Alpine.store("inspector").data = record;
+	};
 
 	getEntityById<T extends GameObject>(id: Id<T>): T | undefined {
 		return this.entityRefs.get(id) as T;
@@ -211,7 +229,7 @@ export class Scene {
 	}
 
 	removeEntityById(id: Id) {
-		this.entityRefs.delete(id)
+		this.entityRefs.delete(id);
 	}
 
 	destroy() {

@@ -73,6 +73,10 @@ export const utils = {
 		return a.x == b.x && a.y == b.y;
 	},
 
+	addCoords(a: Coord, b: Coord): Coord {
+		return { x: a.x + b.x, y: a.y + b.y };
+	},
+
 	checkCollision(object1: FreeCollider, object2: FreeCollider): boolean {
 		let dist = this.getDistance(object1.drawPos, object2.drawPos);
 

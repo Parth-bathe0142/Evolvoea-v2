@@ -1,4 +1,5 @@
 import { GridCharacter } from "./engine/entities/GridCharacter";
+import { Item } from "./engine/entities/items/Item";
 import { Player } from "./engine/entities/Player";
 import { GameObject } from "./engine/GameObject";
 import Id from "./engine/IdGenerator";
@@ -18,6 +19,8 @@ export function registerTypes() {
 
 	registry.register(TileMarker, GameObject)
 	registry.register(HoverMarker, TileMarker, GameObject)
+
+	registry.register(Item, GameObject)
 
 	Id.registry = registry
 }
